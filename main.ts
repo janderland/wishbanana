@@ -12,8 +12,9 @@ const matchMaker = new MatchMaker<WebSocket>(singlePlayer, (player1, player2) =>
 Deno.serve((req, info) => {
     if (req.headers.get("upgrade") != "websocket") {
         console.log(`rejecting connection from ${info.remoteAddr.hostname}`);
-        return new Response(null, {status: 501});
+        return new Response(null, {status: 400});
     }
+    console.log(`accepting connection from ${info.remoteAddr.hostname}`);
 
     const {socket, response} = Deno.upgradeWebSocket(req);
     const remote = info.remoteAddr.hostname
@@ -22,18 +23,17 @@ Deno.serve((req, info) => {
         matchMaker.enqueue(remote, socket);
     });
 
-    socket.addEventListener("close", () => {
+    socket.addEventListener("close", (event) => {
         if (matchMaker.drop(remote)) {
-            console.log(`closed during match making ${remote}`);
+            console.log(`closed during match making ${remote}: ${JSON.stringify(event)}`);
         }
     })
 
-    socket.addEventListener("error", () => {
+    socket.addEventListener("error", (event) => {
         if (matchMaker.drop(remote)) {
-            console.log(`errored during match making ${remote}`);
+            console.log(`errored during match making ${remote}: ${JSON.stringify(event)}`);
         }
     })
 
-    console.log(`accepting connection from ${info.remoteAddr.hostname}`);
     return response;
 });
