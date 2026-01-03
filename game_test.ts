@@ -1,9 +1,9 @@
 import {Counting, Done, Game, Gaming, Naming, State,} from "./game.ts";
 import {Websocket} from './websocket.ts';
 import {Message, MsgType, Serialize} from "./message.ts";
-import {assertSpyCall, assertSpyCalls, spy,} from "https://deno.land/std@0.208.0/testing/mock.ts";
-import {FakeTime} from "https://deno.land/std@0.184.0/testing/time.ts";
-import {assertInstanceOf} from "https://deno.land/std@0.208.0/assert/mod.ts";
+import {assertSpyCall, assertSpyCalls, spy} from "@std/testing/mock";
+import {FakeTime} from "@std/testing/time";
+import {assertInstanceOf} from "@std/assert";
 
 class TestPlayer implements Websocket {
     send = spy();
@@ -46,6 +46,7 @@ function env(
         fn(tm, g, p1, p2);
     } finally {
         g.state.stop();
+        tm.restore();
     }
 }
 
