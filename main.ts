@@ -16,7 +16,7 @@ Deno.serve((req, info) => {
     }
     console.log(`accepting connection from ${info.remoteAddr.hostname}`);
 
-    const {socket, response} = Deno.upgradeWebSocket(req);
+    const {socket, response} = Deno.upgradeWebSocket(req, {protocol: "wishbanana"});
     const remote = info.remoteAddr.hostname
 
     socket.addEventListener("open", () => {
