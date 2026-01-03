@@ -3,7 +3,10 @@ on: [ push ]
 jobs:
   verify:
     runs-on: ubuntu-latest
-    steps:
+    defaults:
+      run:
+        working-directory: ./server
+    step:
       - name: Test
         uses: denoland/setup-deno@v2
         with:
