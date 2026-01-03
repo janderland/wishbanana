@@ -6,7 +6,7 @@ jobs:
     defaults:
       run:
         working-directory: ./server
-    step:
+    steps:
       - name: Test
         uses: denoland/setup-deno@v2
         with:
