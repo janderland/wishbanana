@@ -46,6 +46,7 @@ function env(
         fn(tm, g, p1, p2);
     } finally {
         g.state.stop();
+        tm.restore();
     }
 }
 
