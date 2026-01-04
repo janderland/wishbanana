@@ -1,5 +1,5 @@
-import { createClick, createName, MsgType, ServerMessage } from './messages';
-import { Logger, LogLevel } from './logging';
+import { createClick, createName, MsgType, ServerMessage } from './messages.js';
+import { Logger, LogLevel } from './logging.js';
 
 export interface ServerConnection {
   name(name: string): void;

@@ -1,5 +1,5 @@
-import { createLogger, LogLevel } from './logging';
-import { createServerConnection } from './server';
+import { createLogger, LogLevel } from './logging.js';
+import { createServerConnection } from './server.js';
 
 export interface Game {
   click(): void;
@@ -17,7 +17,8 @@ export interface Game {
 
 export function createGame(name: string): Game {
   const logger = createLogger('Server');
-  const wsUrl = `ws://${window.location.host}`;
+  // const wsUrl = `ws://${window.location.host}`;
+  const wsUrl = `wss://wishbanana.com`;
 
   let playing = true;
   let state = 0;

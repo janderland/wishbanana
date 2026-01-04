@@ -1,7 +1,7 @@
-import { createStateManager } from './state';
-import { createGame, Game } from './game';
-import { createAnimations } from './animations';
-import { $, $$, fadeIn, hide, onClick, onReady, setHtml, show } from './dom';
+import { createStateManager } from './state.js';
+import { createGame, Game } from './game.js';
+import { createAnimations } from './animations.js';
+import { $, $$, fadeIn, hide, onClick, onReady, setHtml, show } from './dom.js';
 
 onReady(() => {
   const mainState = createStateManager($$('body > div.page'));

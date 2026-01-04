@@ -1,4 +1,4 @@
-import { $, hide, show } from './dom';
+import { $, hide, show } from './dom.js';
 
 // The angle reached by the hand when the winning number of clicks is reached
 const MAX_ANGLE = 20;
