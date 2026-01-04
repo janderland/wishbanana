@@ -1,8 +1,9 @@
 var g = require('gulp'),
     $ = require('gulp-load-plugins')(),
-    b = require('Browserify'),
+    b = require('browserify'),
     source = require('vinyl-source-stream'),
-    buffer = require('vinyl-buffer');
+    buffer = require('vinyl-buffer'),
+    sass = require('gulp-sass')(require('sass'));
 
 
 // Configuration
@@ -26,11 +27,18 @@ g.task('js', () => {
         entries: js.input+'/wishbanana.js',
         debug: true
     }).bundle()
+    .on('error', function(err) {
+        console.error('Browserify error:', err.message);
+        this.emit('end');
+    })
     .pipe(source('wishbanana.js'))
     .pipe(buffer())
     .pipe($.sourcemaps.init({ loadMaps: true }))
-        .pipe($.uglify())
-        .on('error', $.util.log)
+    .pipe($.uglify())
+    .on('error', function(err) {
+        console.error('Uglify error:', err.message);
+        this.emit('end');
+    })
     .pipe($.sourcemaps.write('./'))
     .pipe(g.dest(js.output));
 });
@@ -40,15 +48,13 @@ g.task('js', () => {
 // ==========
 
 g.task('css', () => {
-    var sass = $.sass().on('error', $.sass.logError);
-
     var autoprefixer = $.autoprefixer({
         browsers: ['last 2 versions', 'ie >= 9']
     });
 
     return g.src(css.input + '/wishbanana.scss')
         .pipe($.sourcemaps.init())
-        .pipe(sass)
+        .pipe(sass().on('error', sass.logError))
         .pipe(autoprefixer)
         .pipe($.sourcemaps.write())
         .pipe(g.dest(css.output));
@@ -66,28 +72,28 @@ g.task('clean-js', () => {
     return g.src(js.output).pipe($.clean());
 });
 
-g.task('clean', ['clean-css', 'clean-js']);
-
-
-// Watch Tasks
-// ===========
-
-g.task('watch', ['default'], () => {
-    g.watch(css.input + '/*.scss', ['css']);
-    g.watch(js.input + '/*.js', ['js']);
-});
-
-
-// Deploy Task
-// ===========
-
-g.task('deploy', ['default'], () => {
-    return g.src('./{index.html,CNAME,css/*.css,js/*.js,assets/*.svg}')
-        .pipe($.ghPages());
-});
+g.task('clean', g.parallel('clean-css', 'clean-js'));
 
 
 // Default Task
 // ============
 
-g.task('default', ['css', 'js']);
+g.task('default', g.parallel('css', 'js'));
+
+
+// Watch Tasks
+// ===========
+
+g.task('watch', g.series('default', () => {
+    g.watch(css.input + '/*.scss', g.series('css'));
+    g.watch(js.input + '/*.js', g.series('js'));
+}));
+
+
+// Deploy Task
+// ===========
+
+g.task('deploy', g.series('default', () => {
+    return g.src('./{index.html,CNAME,css/*.css,js/*.js,assets/*.svg}')
+        .pipe($.ghPages());
+}));
