@@ -86,7 +86,7 @@ onReady(() => {
     };
 
     g.onPlaying = () => {
-      gameState.switch('playing', true);
+      gameState.switch('playing');
     };
 
     g.onClickCount = (yourClicks, theirClicks) => {

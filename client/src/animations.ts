@@ -15,26 +15,21 @@ const LOSING_TRANS_TIME = 1;
 const RAISING_TRANS_TIME = 1.3;
 const SMASHING_TRANS_TIME = 0.2;
 
-enum AnimationState {
-  PLAYING = 0,
-  LOSING = 1,
-  RAISING = 2,
-  SMASHING = 3,
-}
+type AnimationState =
+  | { type: 'PLAYING'; progress: number }
+  | { type: 'LOSING' }
+  | { type: 'RAISING' }
+  | { type: 'SMASHING' };
 
 type UpdatePositionFn = (
   hand: HTMLElement,
   container: HTMLElement,
   state: AnimationState,
-  progress: number,
 ) => void;
 
 class HandAnimation {
   // Current state of the animation for a hand.
-  private state = AnimationState.PLAYING;
-
-  // Percentage (0.0 - 1.0) of the hand raised. 
-  private progress = 0;
+  private state: AnimationState = { type: 'PLAYING', progress: 0 };
 
   // ID of the timeout used during the game over animation.
   private timeoutId = 0;
@@ -52,20 +47,23 @@ class HandAnimation {
     private updatePosition: UpdatePositionFn,
   ) {
     this.resizeHandler = () =>
-      this.updatePosition(this.hand, this.container, this.state, this.progress);
+      this.updatePosition(this.hand, this.container, this.state);
   }
 
   updateProgress(p: number): void {
-    this.progress = p;
-    this.updatePosition(this.hand, this.container, this.state, this.progress);
+    if (this.state.type !== 'PLAYING') {
+      return;
+    }
+    this.state = { type: 'PLAYING', progress: p };
+    this.updatePosition(this.hand, this.container, this.state);
   }
 
   runWinAnimation(complete?: () => void): void {
     clearTimeout(this.timeoutId);
-    this.updateState(AnimationState.RAISING);
+    this.updateState({ type: 'RAISING' });
 
     this.timeoutId = window.setTimeout(() => {
-      this.updateState(AnimationState.SMASHING);
+      this.updateState({ type: 'SMASHING' });
       this.timeoutId = window.setTimeout(() => {
         hide(this.hand);
         show(this.smasher);
@@ -76,7 +74,7 @@ class HandAnimation {
 
   runLoseAnimation(complete?: () => void): void {
     clearTimeout(this.timeoutId);
-    this.updateState(AnimationState.LOSING);
+    this.updateState({ type: 'LOSING' });
 
     this.timeoutId = window.setTimeout(() => {
       hide(this.hand);
@@ -85,8 +83,7 @@ class HandAnimation {
   }
 
   reset(): void {
-    this.progress = 0;
-    this.updateState(AnimationState.PLAYING);
+    this.updateState({ type: 'PLAYING', progress: 0 });
     show(this.hand);
     hide(this.smasher);
   }
@@ -101,7 +98,7 @@ class HandAnimation {
 
   private updateState(s: AnimationState): void {
     this.state = s;
-    this.updatePosition(this.hand, this.container, this.state, this.progress);
+    this.updatePosition(this.hand, this.container, this.state);
   }
 }
 
@@ -109,12 +106,12 @@ function updateYourPosition(
   hand: HTMLElement,
   container: HTMLElement,
   state: AnimationState,
-  progress: number,
 ): void {
   let x: number, y: number, a: number;
 
-  switch (state) {
-    case AnimationState.PLAYING: {
+  switch (state.type) {
+    case 'PLAYING': {
+      const progress = state.progress;
       const totalX = container.offsetHeight - hand.offsetHeight;
       y = -totalX * progress;
       x = -(hand.offsetWidth / 4) * progress;
@@ -124,7 +121,7 @@ function updateYourPosition(
       break;
     }
 
-    case AnimationState.LOSING:
+    case 'LOSING':
       // Because the #gameContainer is 40vmax tall and centered, 30% of the
       // window height plus the fist's height should get the fist off the screen
       y = window.innerHeight * 0.3 + hand.offsetHeight;
@@ -132,14 +129,14 @@ function updateYourPosition(
       hand.style.transition = `transform ${LOSING_TRANS_TIME}s ease-out`;
       break;
 
-    case AnimationState.RAISING:
+    case 'RAISING':
       y = -(container.offsetHeight - hand.offsetHeight / 2);
       x = -hand.offsetWidth / 2;
       hand.style.transform = `translate(${x}px, ${y}px) rotate(${-MAX_ANGLE}deg)`;
       hand.style.transition = `transform ${RAISING_TRANS_TIME}s ease-in`;
       break;
 
-    case AnimationState.SMASHING:
+    case 'SMASHING':
       y = -(container.offsetHeight / 2 - hand.offsetHeight / 2);
       x = container.offsetWidth / 2 - hand.offsetWidth / 2;
       hand.style.transform = `translate(${x}px, ${y}px)`;
@@ -152,13 +149,13 @@ function updateTheirPosition(
   hand: HTMLElement,
   container: HTMLElement,
   state: AnimationState,
-  progress: number,
 ): void {
   const MARGIN_BOTTOM = 0.25; // 25%
   let x: number, y: number, a: number;
 
-  switch (state) {
-    case AnimationState.PLAYING: {
+  switch (state.type) {
+    case 'PLAYING': {
+      const progress = state.progress;
       const totalX = container.offsetHeight * (1 - MARGIN_BOTTOM) - hand.offsetHeight;
       y = -totalX * progress;
       x = (hand.offsetWidth / 4) * progress;
@@ -168,7 +165,7 @@ function updateTheirPosition(
       break;
     }
 
-    case AnimationState.LOSING:
+    case 'LOSING':
       // Because the #gameContainer is 40vmax tall and centered, 30% of the
       // window height plus the fist's height should get the fist off the screen
       y = window.innerHeight * 0.3 + hand.offsetHeight;
@@ -176,14 +173,14 @@ function updateTheirPosition(
       hand.style.transition = `transform ${LOSING_TRANS_TIME}s ease-out`;
       break;
 
-    case AnimationState.RAISING:
+    case 'RAISING':
       y = -(container.offsetHeight - hand.offsetHeight / 2);
       x = hand.offsetWidth / 2;
       hand.style.transform = `translate(${x}px, ${y}px) rotate(${MAX_ANGLE}deg)`;
       hand.style.transition = `transform ${RAISING_TRANS_TIME}s ease-in`;
       break;
 
-    case AnimationState.SMASHING:
+    case 'SMASHING':
       y = -(
         container.offsetHeight / 2 -
         container.offsetHeight * MARGIN_BOTTOM -
