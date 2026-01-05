@@ -1,10 +1,15 @@
 import { $, hide, show } from './dom.js';
 
-// The angle reached by the hand when the winning number of clicks is reached
+// The angle (degrees) reached by the hand when the
+// winning number of clicks is reached.
 const MAX_ANGLE = 20;
+
+// The duration (milliseconds) of the flashes during
+// gameplay.
 const FLASH_DURATION = 100;
 
-// Time each part of the animation takes
+// The duration (seconds) of each part of the hand's
+// animation.
 const PLAYING_TRANS_TIME = 0.2;
 const LOSING_TRANS_TIME = 1;
 const RAISING_TRANS_TIME = 1.3;
@@ -17,16 +22,6 @@ enum AnimationState {
   SMASHING = 3,
 }
 
-export interface Animations {
-  updateYourProgress(progress: number): void;
-  updateTheirProgress(progress: number): void;
-  gameOver(youWon: boolean, complete?: () => void): void;
-  reset(): void;
-  flash(): void;
-  attachResizeHandler(): void;
-  detachResizeHandler(): void;
-}
-
 type UpdatePositionFn = (
   hand: HTMLElement,
   container: HTMLElement,
@@ -34,10 +29,20 @@ type UpdatePositionFn = (
   progress: number,
 ) => void;
 
-class HandAnimations {
+class HandAnimation {
+  // Current state of the animation for a hand.
   private state = AnimationState.PLAYING;
+
+  // Percentage (0.0 - 1.0) of the hand raised. 
   private progress = 0;
+
+  // ID of the timeout used during the game over animation.
   private timeoutId = 0;
+
+  // This method is attached as an event handler
+  // to detect window resizing. We need to retain
+  // a reference to it so we can remove it when
+  // the game ends.
   private resizeHandler: () => void;
 
   constructor(
@@ -191,78 +196,84 @@ function updateTheirPosition(
   }
 }
 
-export function createAnimations(): Animations {
-  const unsmashed = $('#unsmashed')!;
-  const smashed = $('#smashed')!;
-  const container = $('#gameContainer')!;
-  const flash = $('#flash')!;
+export class Animations {
+  private unsmashed: HTMLElement;
+  private smashed: HTMLElement;
+  private container: HTMLElement;
+  private flashElement: HTMLElement;
+  private flashTimeoutId = 0;
+  private yourHand: HandAnimation;
+  private theirHand: HandAnimation;
 
-  let flashTimeoutId = 0;
+  constructor() {
+    this.unsmashed = $('#unsmashed')!;
+    this.smashed = $('#smashed')!;
+    this.container = $('#gameContainer')!;
+    this.flashElement = $('#flash')!;
 
-  const yourHand = new HandAnimations(
-    $('#yourHand')!,
-    $('#yourSmasher')!,
-    container,
-    updateYourPosition,
-  );
+    this.yourHand = new HandAnimation(
+      $('#yourHand')!,
+      $('#yourSmasher')!,
+      this.container,
+      updateYourPosition,
+    );
 
-  const theirHand = new HandAnimations(
-    $('#theirHand')!,
-    $('#theirSmasher')!,
-    container,
-    updateTheirPosition,
-  );
+    this.theirHand = new HandAnimation(
+      $('#theirHand')!,
+      $('#theirSmasher')!,
+      this.container,
+      updateTheirPosition,
+    );
+  }
 
-  return {
-    updateYourProgress(progress: number): void {
-      yourHand.updateProgress(progress);
-    },
+  updateYourProgress(progress: number): void {
+    this.yourHand.updateProgress(progress);
+  }
 
-    updateTheirProgress(progress: number): void {
-      theirHand.updateProgress(progress);
-    },
+  updateTheirProgress(progress: number): void {
+    this.theirHand.updateProgress(progress);
+  }
 
-    gameOver(youWon: boolean, complete?: () => void): void {
-      if (youWon) {
-        theirHand.runLoseAnimation();
-        yourHand.runWinAnimation(() => {
-          hide(unsmashed);
-          show(smashed);
-          complete?.();
-        });
-      } else {
-        yourHand.runLoseAnimation();
-        theirHand.runWinAnimation(() => {
-          hide(unsmashed);
-          show(smashed);
-          complete?.();
-        });
-      }
-    },
+  gameOver(youWon: boolean, complete?: () => void): void {
+    if (youWon) {
+      this.theirHand.runLoseAnimation();
+      this.yourHand.runWinAnimation(() => {
+        hide(this.unsmashed);
+        show(this.smashed);
+        complete?.();
+      });
+    } else {
+      this.yourHand.runLoseAnimation();
+      this.theirHand.runWinAnimation(() => {
+        hide(this.unsmashed);
+        show(this.smashed);
+        complete?.();
+      });
+    }
+  }
 
-    reset(): void {
-      yourHand.reset();
-      theirHand.reset();
-      hide(smashed);
-      show(unsmashed);
-    },
+  reset(): void {
+    this.yourHand.reset();
+    this.theirHand.reset();
+    hide(this.smashed);
+    show(this.unsmashed);
+  }
 
-    flash(): void {
-      clearTimeout(flashTimeoutId);
-      show(flash);
-      flashTimeoutId = window.setTimeout(() => {
-        hide(flash);
-      }, FLASH_DURATION);
-    },
+  flash(): void {
+    clearTimeout(this.flashTimeoutId);
+    show(this.flashElement);
+    this.flashTimeoutId = window.setTimeout(() => {
+      hide(this.flashElement);
+    }, FLASH_DURATION);
+  }
 
-    attachResizeHandler(): void {
-      yourHand.attachResizeHandler();
-      theirHand.attachResizeHandler();
-    },
+  attachResizeHandler(): void {
+    this.yourHand.attachResizeHandler();
+    this.theirHand.attachResizeHandler();
+  }
 
-    detachResizeHandler(): void {
-      yourHand.detachResizeHandler();
-      theirHand.detachResizeHandler();
-    },
-  };
+  detachResizeHandler(): void {
+    this.yourHand.detachResizeHandler();
+    this.theirHand.detachResizeHandler();
+  }
 }

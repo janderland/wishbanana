@@ -1,6 +1,6 @@
 import { createStateManager } from './state.js';
 import { createGame, Game } from './game.js';
-import { createAnimations } from './animations.js';
+import { Animations } from './animations.js';
 import { $, $$, fadeIn, hide, onClick, onReady, setHtml, show } from './dom.js';
 
 onReady(() => {
@@ -43,7 +43,7 @@ onReady(() => {
 
   const gameState = createStateManager($$('div#game div.state'));
   let g: Game | null = null;
-  const animations = createAnimations();
+  const animations = new Animations();
 
   const updateYourClicks = (yourClicks: number) => {
     animations.updateYourProgress(yourClicks / WIN_CLICKS);
