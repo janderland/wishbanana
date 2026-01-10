@@ -1,94 +1,62 @@
-export type StateCallback = () => void;
+export type PageCallback = () => void;
 
-export interface StateManager {
-  switch(stateName: string, skipCallbacks?: boolean): void;
-  beforeShow(stateName: string, callback: StateCallback): void;
-  afterShow(stateName: string, callback: StateCallback): void;
-  beforeHide(stateName: string, callback: StateCallback): void;
-  child(stateName: string, childManager: StateManager): void;
-  current(): string | null;
-}
+export class PageManager {
+  private elements: Element[];
+  private currentPage: string;
+  private beforeShowCallbacks = new Map<string, PageCallback>();
+  private afterShowCallbacks = new Map<string, PageCallback>();
+  private beforeHideCallbacks = new Map<string, PageCallback>();
+  private childManagers = new Map<string, PageManager>();
 
-export function createStateManager(
-  elements: NodeListOf<Element> | Element[],
-): StateManager {
-  const elementArray = Array.from(elements);
-  let currentState: string | null = null;
-
-  const beforeShowCallbacks = new Map<string, StateCallback[]>();
-  const afterShowCallbacks = new Map<string, StateCallback[]>();
-  const beforeHideCallbacks = new Map<string, StateCallback[]>();
-  const childManagers = new Map<string, StateManager>();
-
-  function addCallback(
-    map: Map<string, StateCallback[]>,
-    state: string,
-    cb: StateCallback,
-  ): void {
-    if (!map.has(state)) {
-      map.set(state, []);
-    }
-    map.get(state)!.push(cb);
+  constructor(elements: NodeListOf<Element> | Element[]) {
+    this.elements = Array.from(elements);
+    this.currentPage = this.elements[0].id;
   }
 
-  function runCallbacks(map: Map<string, StateCallback[]>, state: string): void {
-    const callbacks = map.get(state);
-    if (callbacks) {
-      callbacks.forEach((cb) => cb());
+  switch(stateName: string): void {
+    // Hide current page
+    this.beforeHideCallbacks.get(this.currentPage)?.();
+    const child = this.childManagers.get(this.currentPage);
+    if (child && child.current()) {
+      // Switch to empty page (hide everything)
+      child.switch('');
     }
+
+    // Hide all elements
+    this.elements.forEach((el) => {
+      (el as HTMLElement).style.display = 'none';
+    });
+
+    // Show new page
+    this.beforeShowCallbacks.get(stateName)?.();
+
+    const targetElement = this.elements.find((el) => el.id === stateName);
+    if (targetElement) {
+      (targetElement as HTMLElement).style.display = 'block';
+    }
+
+    this.currentPage = stateName;
+
+    this.afterShowCallbacks.get(stateName)?.();
   }
 
-  return {
-    switch(stateName: string, skipCallbacks = false): void {
-      // Hide current state
-      if (currentState && !skipCallbacks) {
-        runCallbacks(beforeHideCallbacks, currentState);
-        const child = childManagers.get(currentState);
-        if (child && child.current()) {
-          child.switch('', skipCallbacks); // Hide child
-        }
-      }
+  beforeShow(stateName: string, callback: PageCallback): void {
+    this.beforeShowCallbacks.set(stateName, callback);
+  }
 
-      // Hide all elements
-      elementArray.forEach((el) => {
-        (el as HTMLElement).style.display = 'none';
-      });
+  afterShow(stateName: string, callback: PageCallback): void {
+    this.afterShowCallbacks.set(stateName, callback);
+  }
 
-      // Show new state
-      if (!skipCallbacks) {
-        runCallbacks(beforeShowCallbacks, stateName);
-      }
+  beforeHide(stateName: string, callback: PageCallback): void {
+    this.beforeHideCallbacks.set(stateName, callback);
+  }
 
-      const targetElement = elementArray.find((el) => el.id === stateName);
-      if (targetElement) {
-        (targetElement as HTMLElement).style.display = 'block';
-      }
+  child(stateName: string, childManager: PageManager): void {
+    this.childManagers.set(stateName, childManager);
+  }
 
-      currentState = stateName;
-
-      if (!skipCallbacks) {
-        runCallbacks(afterShowCallbacks, stateName);
-      }
-    },
-
-    beforeShow(stateName: string, callback: StateCallback): void {
-      addCallback(beforeShowCallbacks, stateName, callback);
-    },
-
-    afterShow(stateName: string, callback: StateCallback): void {
-      addCallback(afterShowCallbacks, stateName, callback);
-    },
-
-    beforeHide(stateName: string, callback: StateCallback): void {
-      addCallback(beforeHideCallbacks, stateName, callback);
-    },
-
-    child(stateName: string, childManager: StateManager): void {
-      childManagers.set(stateName, childManager);
-    },
-
-    current(): string | null {
-      return currentState;
-    },
-  };
+  current(): string {
+    return this.currentPage;
+  }
 }

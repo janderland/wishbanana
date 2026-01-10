@@ -1,10 +1,10 @@
-import { createStateManager } from './state.js';
+import { PageManager } from './page.js';
 import { createGame, Game } from './game.js';
 import { Animations } from './animations.js';
 import { $, $$, fadeIn, hide, onClick, onReady, setHtml, show } from './dom.js';
 
 onReady(() => {
-  const mainState = createStateManager($$('body > div.page'));
+  const mainState = new PageManager($$('body > div.page'));
 
   // When all images are loaded, switch to the menu page
   mainState.switch('menu');
@@ -41,7 +41,7 @@ onReady(() => {
   // GAME ----------------------------------------------------------
   let WIN_CLICKS = 1;
 
-  const gameState = createStateManager($$('div#game div.state'));
+  const gameState = new PageManager($$('div#game div.state'));
   let g: Game | null = null;
   const animations = new Animations();
 
