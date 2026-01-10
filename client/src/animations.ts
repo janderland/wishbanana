@@ -23,7 +23,7 @@ type AnimationState =
 
 abstract class HandAnimation {
   // Current state of the animation for a hand.
-  private state: AnimationState = { name: 'PLAYING', progress: 0 };
+  protected state: AnimationState = { name: 'PLAYING', progress: 0 };
 
   // ID of the timeout used during the game over animation.
   private timeoutId = 0;
@@ -40,13 +40,13 @@ abstract class HandAnimation {
     protected container: HTMLElement,
   ) {
     this.resizeHandler = () =>
-      this.updatePosition(this.state);
+      this.updatePosition();
   }
 
   // Your hand and the opponent's hand have slightly different
   // animation logic, and those differences are defined by
   // subclasses using this method.
-  protected abstract updatePosition(state: AnimationState): void;
+  protected abstract updatePosition(): void;
 
   // Provide the percentage (0.0 - 1.0) of clicks performed
   // to abdjust the height of the hand. The hand begins at
@@ -56,7 +56,7 @@ abstract class HandAnimation {
       return;
     }
     this.state = { name: 'PLAYING', progress: p };
-    this.updatePosition(this.state);
+    this.updatePosition();
   }
 
   // Run the win animation and call the provided callback
@@ -103,17 +103,17 @@ abstract class HandAnimation {
 
   private updateState(s: AnimationState): void {
     this.state = s;
-    this.updatePosition(this.state);
+    this.updatePosition();
   }
 }
 
 class YourHand extends HandAnimation {
-  protected updatePosition(state: AnimationState): void {
+  protected updatePosition(): void {
     let x: number, y: number, a: number;
 
-    switch (state.name) {
+    switch (this.state.name) {
       case 'PLAYING': {
-        const progress = state.progress;
+        const progress = this.state.progress;
         const totalX = this.container.offsetHeight - this.hand.offsetHeight;
         y = -totalX * progress;
         x = -(this.hand.offsetWidth / 4) * progress;
@@ -149,13 +149,13 @@ class YourHand extends HandAnimation {
 }
 
 class TheirHand extends HandAnimation {
-  protected updatePosition(state: AnimationState): void {
+  protected updatePosition(): void {
     const MARGIN_BOTTOM = 0.25; // 25%
     let x: number, y: number, a: number;
 
-    switch (state.name) {
+    switch (this.state.name) {
       case 'PLAYING': {
-        const progress = state.progress;
+        const progress = this.state.progress;
         const totalX = this.container.offsetHeight * (1 - MARGIN_BOTTOM) - this.hand.offsetHeight;
         y = -totalX * progress;
         x = (this.hand.offsetWidth / 4) * progress;
