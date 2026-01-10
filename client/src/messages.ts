@@ -62,12 +62,3 @@ export type ServerMessage =
 export type ClientMessage = Name | Click;
 
 export type Message = ServerMessage | ClientMessage;
-
-// Helper functions for creating client messages
-export function createName(name: string): Name {
-  return { id: MsgType.NAME, name };
-}
-
-export function createClick(): Click {
-  return { id: MsgType.CLICK };
-}

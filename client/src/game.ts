@@ -1,11 +1,7 @@
-import { createLogger, LogLevel } from './logging.js';
-import { createServerConnection } from './server.js';
+import { MsgType, ServerMessage } from './messages.js';
 
-export interface Game {
-  click(): void;
-  quit(): void;
-  count: number;
-
+export class Game {
+  count = 0;
   onConnected?: () => void;
   onWinCount?: (count: number) => void;
   onMatched?: (opponentName: string) => void;
@@ -13,110 +9,91 @@ export interface Game {
   onPlaying?: () => void;
   onClickCount?: (yourClicks: number, theirClicks: number) => void;
   onGameOver?: (youWon: boolean) => void;
-}
 
-export function createGame(name: string): Game {
-  const logger = createLogger('Server');
-  // const wsUrl = `ws://${window.location.host}`;
-  const wsUrl = `wss://wishbanana.com`;
+  private ws: WebSocket;
+  private playing = true;
+  private state = 'connected';
 
-  let playing = true;
-  let state = 0;
+  constructor(name: string) {
+    this.ws = new WebSocket('wss://wishbanana.com', ['wishbanana']);
 
-  const server = createServerConnection(wsUrl, logger);
+    this.ws.onopen = () => {
+      this.onConnected?.();
+    };
 
-  const game: Game = {
-    count: 0,
-
-    click(): void {
-      if (state === 3) {
-        this.count++;
-        server.click();
+    this.ws.onmessage = (event) => {
+      let message: ServerMessage;
+      try {
+        message = JSON.parse(event.data) as ServerMessage;
+      } catch {
+        return;
       }
-    },
 
-    quit(): void {
-      if (playing) {
-        server.close();
-        playing = false;
-
-        server.onClose = undefined;
-        server.onConnected = undefined;
-        server.onWinCount = undefined;
-        server.onNamePlease = undefined;
-        server.onMatched = undefined;
-        server.onCountDown = undefined;
-        server.onClickCount = undefined;
-        server.onGameOver = undefined;
+      switch (message.id) {
+        case MsgType.WINCOUNT:
+          this.onWinCount?.(message.count);
+          break;
+        case MsgType.NAMEPLEASE:
+          if (this.changeState('naming')) {
+            this.ws.send(JSON.stringify({ id: MsgType.NAME, name }));
+          }
+          break;
+        case MsgType.MATCHED:
+          if (this.changeState('matched')) {
+            this.onMatched?.(message.opponentName);
+          }
+          break;
+        case MsgType.COUNTDOWN:
+          if (message.value > 0) {
+            this.onCountDown?.(message.value);
+          } else if (this.changeState('playing')) {
+            this.onPlaying?.();
+          }
+          break;
+        case MsgType.CLICKCOUNT:
+          this.count = message.yourCount;
+          this.onClickCount?.(message.yourCount, message.theirCount);
+          break;
+        case MsgType.GAMEOVER:
+          if (this.changeState('gameOver')) {
+            this.onGameOver?.(message.won);
+            this.quit();
+          }
+          break;
       }
-    },
+    };
+
+    this.ws.onclose = () => {
+      this.playing = false;
+    };
+  }
+
+  private static transitions: Record<string, string> = {
+    connected: 'naming',
+    naming: 'matched',
+    matched: 'playing',
+    playing: 'gameOver',
   };
 
-  function changeState(newState: number): boolean {
-    if (newState - state === 1) {
-      state = newState;
-      logger.log(`Game state changed: ${state}`, LogLevel.INFO);
+  private changeState(newState: string): boolean {
+    if (Game.transitions[this.state] === newState) {
+      this.state = newState;
       return true;
     }
-
-    logger.log(
-      `Invalid state change requested: ${state} to ${newState}`,
-      LogLevel.WARNING,
-    );
     return false;
   }
 
-  server.onClose = () => {
-    playing = false;
-  };
-
-  server.onError = (data) => {
-    logger.log(`ERR: ${data}`, LogLevel.ERROR);
-  };
-
-  server.onConnected = () => {
-    game.onConnected?.();
-  };
-
-  server.onWinCount = (count) => {
-    game.onWinCount?.(count);
-  };
-
-  server.onNamePlease = () => {
-    if (changeState(1)) {
-      server.name(name);
+  click(): void {
+    if (this.state === 'playing') {
+      this.count++;
+      this.ws.send(JSON.stringify({ id: MsgType.CLICK }));
     }
-  };
+  }
 
-  server.onMatched = (opponentName) => {
-    if (changeState(2)) {
-      game.onMatched?.(opponentName);
+  quit(): void {
+    if (this.playing) {
+      this.ws.close();
+      this.playing = false;
     }
-  };
-
-  server.onCountDown = (value) => {
-    if (state !== 2) {
-      logger.log(`Received countdown message during state ${state}`, LogLevel.WARNING);
-    }
-
-    if (value > 0) {
-      game.onCountDown?.(value);
-    } else if (changeState(3)) {
-      game.onPlaying?.();
-    }
-  };
-
-  server.onClickCount = (yourClicks, theirClicks) => {
-    game.count = yourClicks;
-    game.onClickCount?.(yourClicks, theirClicks);
-  };
-
-  server.onGameOver = (youWon) => {
-    if (changeState(4)) {
-      game.onGameOver?.(youWon);
-      game.quit();
-    }
-  };
-
-  return game;
+  }
 }

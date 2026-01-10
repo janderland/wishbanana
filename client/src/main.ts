@@ -1,5 +1,5 @@
-import { PageManager } from './page.js';
-import { createGame, Game } from './game.js';
+import { PageManager } from './state.js';
+import { Game } from './game.js';
 import { Animations } from './animations.js';
 import { $, $$, fadeIn, hide, onClick, onReady, setHtml, show } from './dom.js';
 
@@ -62,7 +62,7 @@ onReady(() => {
   };
 
   const initNewGame = (name: string) => {
-    g = createGame(name);
+    g = new Game(name);
 
     g.onConnected = () => {
       setHtml($('#matching > h2'), 'matching...');
