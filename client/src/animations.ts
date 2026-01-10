@@ -4,16 +4,12 @@ import { $, hide, show } from './dom.js';
 // winning number of clicks is reached.
 const MAX_ANGLE = 20;
 
-// The duration (milliseconds) of the flashes during
-// gameplay.
+// The duration of various animations in milliseconds.
 const FLASH_DURATION = 100;
-
-// The duration (seconds) of each part of the hand's
-// animation.
-const PLAYING_TRANS_TIME = 0.2;
-const LOSING_TRANS_TIME = 1;
-const RAISING_TRANS_TIME = 1.3;
-const SMASHING_TRANS_TIME = 0.2;
+const PLAYING_TRANS_TIME = 200;
+const LOSING_TRANS_TIME = 1000;
+const RAISING_TRANS_TIME = 1300;
+const SMASHING_TRANS_TIME = 200;
 
 type AnimationState =
   | { name: 'PLAYING'; progress: number }
@@ -119,7 +115,7 @@ class YourHand extends HandAnimation {
         x = -(this.hand.offsetWidth / 4) * progress;
         a = -MAX_ANGLE * progress;
         this.hand.style.transform = `translate(${x}px, ${y}px) rotate(${a}deg)`;
-        this.hand.style.transition = `transform ${PLAYING_TRANS_TIME}s ease-in`;
+        this.hand.style.transition = `transform ${PLAYING_TRANS_TIME}ms ease-in`;
         break;
       }
 
@@ -128,21 +124,21 @@ class YourHand extends HandAnimation {
         // window height plus the fist's height should get the fist off the screen
         y = window.innerHeight * 0.3 + this.hand.offsetHeight;
         this.hand.style.transform = `translate(0, ${y}px)`;
-        this.hand.style.transition = `transform ${LOSING_TRANS_TIME}s ease-out`;
+        this.hand.style.transition = `transform ${LOSING_TRANS_TIME}ms ease-out`;
         break;
 
       case 'RAISING':
         y = -(this.container.offsetHeight - this.hand.offsetHeight / 2);
         x = -this.hand.offsetWidth / 2;
         this.hand.style.transform = `translate(${x}px, ${y}px) rotate(${-MAX_ANGLE}deg)`;
-        this.hand.style.transition = `transform ${RAISING_TRANS_TIME}s ease-in`;
+        this.hand.style.transition = `transform ${RAISING_TRANS_TIME}ms ease-in`;
         break;
 
       case 'SMASHING':
         y = -(this.container.offsetHeight / 2 - this.hand.offsetHeight / 2);
         x = this.container.offsetWidth / 2 - this.hand.offsetWidth / 2;
         this.hand.style.transform = `translate(${x}px, ${y}px)`;
-        this.hand.style.transition = `transform ${SMASHING_TRANS_TIME}s ease-out`;
+        this.hand.style.transition = `transform ${SMASHING_TRANS_TIME}ms ease-out`;
         break;
     }
   }
@@ -161,7 +157,7 @@ class TheirHand extends HandAnimation {
         x = (this.hand.offsetWidth / 4) * progress;
         a = MAX_ANGLE * progress;
         this.hand.style.transform = `translate(${x}px, ${y}px) rotate(${a}deg)`;
-        this.hand.style.transition = `transform ${PLAYING_TRANS_TIME}s ease-in`;
+        this.hand.style.transition = `transform ${PLAYING_TRANS_TIME}ms ease-in`;
         break;
       }
 
@@ -170,14 +166,14 @@ class TheirHand extends HandAnimation {
         // window height plus the fist's height should get the fist off the screen
         y = window.innerHeight * 0.3 + this.hand.offsetHeight;
         this.hand.style.transform = `translate(0, ${y}px)`;
-        this.hand.style.transition = `transform ${LOSING_TRANS_TIME}s ease-out`;
+        this.hand.style.transition = `transform ${LOSING_TRANS_TIME}ms ease-out`;
         break;
 
       case 'RAISING':
         y = -(this.container.offsetHeight - this.hand.offsetHeight / 2);
         x = this.hand.offsetWidth / 2;
         this.hand.style.transform = `translate(${x}px, ${y}px) rotate(${MAX_ANGLE}deg)`;
-        this.hand.style.transition = `transform ${RAISING_TRANS_TIME}s ease-in`;
+        this.hand.style.transition = `transform ${RAISING_TRANS_TIME}ms ease-in`;
         break;
 
       case 'SMASHING':
@@ -188,7 +184,7 @@ class TheirHand extends HandAnimation {
         );
         x = -(this.container.offsetWidth / 2 - this.hand.offsetWidth / 2);
         this.hand.style.transform = `translate(${x}px, ${y}px)`;
-        this.hand.style.transition = `transform ${SMASHING_TRANS_TIME}s ease-out`;
+        this.hand.style.transition = `transform ${SMASHING_TRANS_TIME}ms ease-out`;
         break;
     }
   }
