@@ -1,7 +1,7 @@
-import { PageManager } from './state.js';
-import { Game } from './game.js';
-import { Animations } from './animations.js';
 import { $, $$, fadeIn, hide, onClick, onReady, setHtml, show } from './dom.js';
+import { PageManager } from './state.js';
+import { Animations } from './animations.js';
+import { Game } from './game.js';
 
 onReady(() => {
   const mainState = new PageManager($$('body > div.page'));
@@ -23,8 +23,8 @@ onReady(() => {
     show($('#helpModal'));
     show($('#menu #tint'));
 
-    document.addEventListener(
-      'click',
+    onClick(
+      $('body'),
       () => {
         hide($('#helpModal'));
         hide($('#menu #tint'));
@@ -69,7 +69,7 @@ onReady(() => {
     };
 
     g.onWinCount = (count) => {
-      console.log('got win count ' + count);
+      console.log('win count ' + count);
       WIN_CLICKS = count;
       if (WIN_CLICKS < 1) {
         WIN_CLICKS = 1;

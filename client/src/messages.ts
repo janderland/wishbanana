@@ -59,6 +59,6 @@ export type ServerMessage =
   | ClickCount
   | GameOver;
 
-export type ClientMessage = Name | Click;
-
-export type Message = ServerMessage | ClientMessage;
+export type ClientMessage =
+  | Name
+  | Click;

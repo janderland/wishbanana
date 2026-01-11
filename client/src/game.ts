@@ -1,5 +1,13 @@
 import { MsgType, ServerMessage } from './messages.js';
 
+enum GameState {
+  Connected,
+  Naming,
+  Matched,
+  Playing,
+  GameOver,
+}
+
 export class Game {
   count = 0;
   onConnected?: () => void;
@@ -11,8 +19,7 @@ export class Game {
   onGameOver?: (youWon: boolean) => void;
 
   private ws: WebSocket;
-  private playing = true;
-  private state = 'connected';
+  private state = GameState.Connected;
 
   constructor(name: string) {
     this.ws = new WebSocket('wss://wishbanana.com', ['wishbanana']);
@@ -33,67 +40,56 @@ export class Game {
         case MsgType.WINCOUNT:
           this.onWinCount?.(message.count);
           break;
+
         case MsgType.NAMEPLEASE:
-          if (this.changeState('naming')) {
-            this.ws.send(JSON.stringify({ id: MsgType.NAME, name }));
-          }
+          this.changeState(GameState.Naming)
+          this.ws.send(JSON.stringify({ id: MsgType.NAME, name }));
           break;
+
         case MsgType.MATCHED:
-          if (this.changeState('matched')) {
-            this.onMatched?.(message.opponentName);
-          }
+          this.changeState(GameState.Matched)
+          this.onMatched?.(message.opponentName);
           break;
+
         case MsgType.COUNTDOWN:
           if (message.value > 0) {
             this.onCountDown?.(message.value);
-          } else if (this.changeState('playing')) {
-            this.onPlaying?.();
+            break;
           }
+          this.changeState(GameState.Playing)
+          this.onPlaying?.();
           break;
+
         case MsgType.CLICKCOUNT:
           this.count = message.yourCount;
           this.onClickCount?.(message.yourCount, message.theirCount);
           break;
+
         case MsgType.GAMEOVER:
-          if (this.changeState('gameOver')) {
-            this.onGameOver?.(message.won);
-            this.quit();
-          }
+          this.changeState(GameState.GameOver)
+          this.onGameOver?.(message.won);
+          this.quit();
           break;
       }
     };
-
-    this.ws.onclose = () => {
-      this.playing = false;
-    };
   }
 
-  private static transitions: Record<string, string> = {
-    connected: 'naming',
-    naming: 'matched',
-    matched: 'playing',
-    playing: 'gameOver',
-  };
-
-  private changeState(newState: string): boolean {
-    if (Game.transitions[this.state] === newState) {
-      this.state = newState;
-      return true;
+  private changeState(newState: GameState) {
+    if (newState - this.state !== 1) {
+      return
     }
-    return false;
+    console.log(`game state: ${GameState[newState]}`);
+    this.state = newState;
   }
 
   click(): void {
-    if (this.state === 'playing') {
-      this.count++;
+    if (this.ws.readyState === WebSocket.OPEN) {
       this.ws.send(JSON.stringify({ id: MsgType.CLICK }));
+      this.count++;
     }
   }
 
   quit(): void {
-    if (this.playing) {
-      this.ws.close();
-      this.playing = false;
-    }
+    this.ws.close();
   }
 }

@@ -31,6 +31,7 @@ abstract class HandAnimation {
   private resizeHandler: () => void;
 
   constructor(
+    private label: string,
     protected hand: HTMLElement,
     protected smasher: HTMLElement,
     protected container: HTMLElement,
@@ -67,8 +68,8 @@ abstract class HandAnimation {
         hide(this.hand);
         show(this.smasher);
         complete?.();
-      }, SMASHING_TRANS_TIME * 1000);
-    }, RAISING_TRANS_TIME * 1000);
+      }, SMASHING_TRANS_TIME);
+    }, RAISING_TRANS_TIME);
   }
 
   // Run the lose animation and call the provided callback
@@ -80,7 +81,7 @@ abstract class HandAnimation {
     this.timeoutId = window.setTimeout(() => {
       hide(this.hand);
       complete?.();
-    }, LOSING_TRANS_TIME * 1000);
+    }, LOSING_TRANS_TIME);
   }
 
   reset(): void {
@@ -98,12 +99,17 @@ abstract class HandAnimation {
   }
 
   private updateState(s: AnimationState): void {
+    console.log(`animation state (${this.label}): ${s.name}`);
     this.state = s;
     this.updatePosition();
   }
 }
 
 class YourHand extends HandAnimation {
+  constructor(hand: HTMLElement, smasher: HTMLElement, container: HTMLElement) {
+    super('yours', hand, smasher, container);
+  }
+
   protected updatePosition(): void {
     let x: number, y: number, a: number;
 
@@ -145,6 +151,10 @@ class YourHand extends HandAnimation {
 }
 
 class TheirHand extends HandAnimation {
+  constructor(hand: HTMLElement, smasher: HTMLElement, container: HTMLElement) {
+    super('theirs', hand, smasher, container);
+  }
+
   protected updatePosition(): void {
     const MARGIN_BOTTOM = 0.25; // 25%
     let x: number, y: number, a: number;

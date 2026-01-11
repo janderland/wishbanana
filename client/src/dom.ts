@@ -38,8 +38,9 @@ export function setHtml(el: HTMLElement | null, html: string): void {
 export function onClick(
   el: HTMLElement | null,
   handler: (e: MouseEvent) => void,
+  options?: AddEventListenerOptions,
 ): void {
-  if (el) el.addEventListener('click', handler);
+  if (el) el.addEventListener('click', handler, options);
 }
 
 export function onMouseDown(handler: (e: MouseEvent) => void): void {
