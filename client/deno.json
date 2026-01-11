@@ -1,0 +1,19 @@
+{
+  "tasks": {
+    "build": "deno run -A npm:typescript/tsc -p tsconfig.json",
+    "dev": "deno run -A npm:typescript/tsc -p tsconfig.json --watch",
+    "lint": "deno lint src/",
+    "fmt": "deno fmt src/"
+  },
+  "lint": {
+    "include": ["src/"],
+    "rules": {
+      "exclude": ["no-window", "no-window-prefix", "no-sloppy-imports"]
+    }
+  },
+  "fmt": {
+    "include": ["src/"],
+    "lineWidth": 100,
+    "singleQuote": true
+  }
+}

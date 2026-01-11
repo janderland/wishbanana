@@ -1,0 +1,496 @@
+/* ==========================================================================
+   WishBanana Stylesheet - Modern CSS
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   Custom Properties (Variables)
+   -------------------------------------------------------------------------- */
+:root {
+  --primary: #CC99FF;
+  --secondary: #615865;
+}
+
+
+/* --------------------------------------------------------------------------
+   Base Styles
+   -------------------------------------------------------------------------- */
+
+html {
+  font-family: sans-serif;
+}
+
+body {
+  /* prevent scrolling on desktop browsers */
+  overflow: hidden;
+  margin: 0;
+}
+
+
+/* Headers
+   ======= */
+
+h1 {
+  font-size: 15vmin;
+  font-weight: bold;
+  color: var(--primary);
+  /* Adding multiple shadows to make 3D text */
+  text-shadow:
+    0 1px  0 #ccc,
+    0 2px  0 #c9c9c9,
+    0 3px  0 #bbb,
+    0 4px  0 #b9b9b9,
+    0 5px  0 #aaa,
+    0 6px  1px rgba(0,0,0,.1),
+    0 0    5px rgba(0,0,0,.1),
+    0 1px  3px rgba(0,0,0,.3),
+    0 3px  5px rgba(0,0,0,.2),
+    0 5px  10px rgba(0,0,0,.25),
+    0 10px 10px rgba(0,0,0,.2),
+    0 20px 30px rgba(0,0,0,.5);
+}
+
+h2 {
+  font-size: 10vmin;
+  font-weight: bold;
+  color: var(--primary);
+  /* Adding multiple shadows to make 3D text */
+  text-shadow:
+    0 1px  0 #ccc,
+    0 2px  0 #c9c9c9,
+    0 3px  0 #bbb,
+    0 4px  0 #b9b9b9,
+    0 5px  0 #aaa,
+    0 6px  1px rgba(0,0,0,.1),
+    0 0    5px rgba(0,0,0,.1),
+    0 1px  3px rgba(0,0,0,.3),
+    0 3px  5px rgba(0,0,0,.2),
+    0 5px  10px rgba(0,0,0,.25),
+    0 10px 10px rgba(0,0,0,.2),
+    0 20px 30px rgba(0,0,0,.5);
+}
+
+h3 {
+  font-size: 8vmin;
+  color: var(--secondary);
+  /* Adding multiple shadows to make 3D text */
+  text-shadow:
+    0 1px 0 #ccc,
+    0 2px 0 #c9c9c9,
+    0 3px 0 #bbb,
+    0 4px 0 #b9b9b9,
+    0 5px 0 #aaa;
+}
+
+
+/* UI Elements
+   =========== */
+
+button {
+  font-size: 6vmin;
+  border: 1px solid black;
+  border-radius: 5px;
+  text-align: center;
+  background-color: var(--primary);
+  padding: 1vmax;
+  color: white;
+}
+
+input {
+  font-size: 6vmin;
+  border: 1px solid black;
+  border-radius: 5px;
+  text-align: center;
+  padding: 10px;
+}
+
+
+/* --------------------------------------------------------------------------
+   State - Interactive States
+   -------------------------------------------------------------------------- */
+
+button:hover {
+  box-shadow: inset 0 0 5px white;
+  border-color: white;
+}
+
+
+/* --------------------------------------------------------------------------
+   Layout - Loading Page
+   -------------------------------------------------------------------------- */
+
+#loading {
+  background-color: #547aff;
+}
+
+#loadingMessage {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+}
+
+
+/* --------------------------------------------------------------------------
+   Layout - Menu Page
+   -------------------------------------------------------------------------- */
+
+#title {
+  position: absolute;
+  left: 50%;
+  transform: translate(-50%, 0);
+  top: 8vh;
+  text-align: center;
+}
+
+#menuButtons {
+  position: absolute;
+  left: 50%;
+  transform: translate(-50%, 0);
+  bottom: 10vh;
+  white-space: nowrap;
+}
+
+#menuToGame {
+  font-size: 10vmin;
+}
+
+#helpModal {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 80%;
+  max-width: 80vmin;
+  padding: 10px;
+  text-align: center;
+  font-size: 7vmin;
+  background-color: white;
+  box-shadow: inset 0px 0px 20px 1px rgba(0,0,0,0.75);
+  display: none;
+}
+
+#tint {
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  background-color: rgba(0, 0, 0, 0.75);
+  display: none;
+}
+
+
+/* --------------------------------------------------------------------------
+   Layout - Story Page
+   -------------------------------------------------------------------------- */
+
+#storyContent {
+  position: relative;
+  width: 80%;
+  height: 100%;
+  overflow-y: scroll;
+  overflow-x: hidden;
+  margin: 0 auto;
+  padding: 0 20px;
+  box-shadow: inset 0px 0px 20px 1px rgba(0,0,0,0.75);
+  background-color: white;
+}
+
+#storyTitle {
+  width: 100%;
+  text-align: center;
+  font-size: 10vh;
+  color: var(--primary);
+}
+
+
+/* --------------------------------------------------------------------------
+   Layout - Game Page
+   -------------------------------------------------------------------------- */
+
+#naming {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+}
+
+#namingDone {
+  margin-top: 5px;
+}
+
+#matching {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+#counting {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+}
+
+#count {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+
+  & h1 {
+    font-size: 75vmin;
+  }
+}
+
+#playingBackground {
+  position: absolute;
+  /*
+   This height and width provides enough room for #playingBackground
+   to rotate but still completely cover the viewport.
+   */
+  height: 142vmax;
+  width: 142vmax;
+
+  /* Rotate it so the background is scrolling from top to bottom. */
+  transform: rotate(90deg);
+
+  animation-name: playingBackgroundFrames;
+  animation-duration: 5s;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
+
+#playing {
+  background-color: white;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+}
+
+#flash {
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  background-color: #ffffcc;
+  display: none;
+  opacity: 0.7;
+}
+
+#gameContainer {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  height: 40vmax;
+  width: 40vmax;
+  max-width: 100%;
+  max-height: 100%;
+}
+
+#smashed {
+  display: none;
+}
+
+#theirHand {
+  height: 15vmax;
+  max-width: 100%;
+  max-height: 100%;
+  position: absolute;
+  right: 0;
+  bottom: 25%;
+}
+
+#theirSmasher {
+  display: none;
+}
+
+#yourHand {
+  height: 20vmax;
+  max-width: 100%;
+  max-height: 100%;
+  position: absolute;
+  left: 0;
+  bottom: 0;
+}
+
+#yourSmasher {
+  display: none;
+}
+
+#clickCover {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+}
+
+#gameOverBanner {
+  position: absolute;
+  top: 50%;
+  transform: translate(0, -50%);
+  text-align: center;
+  width: 100%;
+  background-color: #fff;
+  display: none;
+
+  & h1 {
+    margin: 0;
+  }
+}
+
+#playAgain {
+  position: absolute;
+  left: 50%;
+  transform: translate(-50%, 0);
+  top: 110%;
+  font-size: 5vmin;
+}
+
+
+/* --------------------------------------------------------------------------
+   Modules - Reusable Components
+   -------------------------------------------------------------------------- */
+
+.back {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  padding: 1px;
+  font-size: 5vmin;
+}
+
+.page {
+  width: 80vw;
+  height: 100vh;
+  margin: 0 auto;
+  overflow: hidden;
+  position: relative;
+  display: none;
+}
+
+.banana {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  height: 40vmax;
+  max-width: 100%;
+  max-height: 100%;
+}
+
+
+/* Scrolling Backgrounds
+   ===================== */
+
+/*
+  Div used to display background moving accross the screen.
+  An animated background isn't used because browsers currently
+  don't GPU optimize such animations.
+*/
+
+.scrolling {
+  position: absolute;
+  /* Width is twice the size of the repeating background */
+  width: 200%;
+  min-width: 1000px;
+  height: 100%;
+
+  background-size: 500px 500px;
+  background-position: 0px 0px;
+  background-repeat: repeat;
+}
+
+.clouds {
+  background-color: #547aff;
+  background-image: url('../assets/clouds.svg');
+  animation: scrollingFrames 10s linear infinite;
+}
+
+.lights {
+  background-color: #547aff;
+  background-image: url('../assets/lights.svg');
+  animation: scrollingFrames 1s linear infinite;
+}
+
+.playingNames {
+  position: absolute;
+  left: 50%;
+  transform: translate(-50%, 0);
+  bottom: 0;
+  width: 70%;
+}
+
+.name {
+  position: absolute;
+  bottom: 0;
+  width: 40%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  /* So that the text-shadow doesn't get cut off */
+  padding-bottom: 5px;
+
+  &.yourName {
+    left: 0;
+    text-align: left;
+
+    /* Resize the layout for smaller screens */
+    @media (max-width: 600px) {
+      left: 8vmin;
+      bottom: 10vmin;
+      width: 100%;
+    }
+  }
+
+  &.theirName {
+    right: 0;
+    text-align: right;
+
+    /* Resize the layout for smaller screens */
+    @media (max-width: 600px) {
+      left: 8vmin;
+      text-align: left;
+      width: 100%;
+    }
+  }
+}
+
+.vs {
+  position: absolute;
+  left: 50%;
+  transform: translate(-50%, 0);
+  bottom: 5px;
+  height: 8vmin;
+  width: 8vmin;
+  color: white;
+  font-size: 6vmin;
+  background-color: #CC99FF;
+  border: 1px white;
+  border-radius: 4vmin;
+  text-align: center;
+
+  /* Resize the layout for smaller screens */
+  @media (max-width: 600px) {
+    left: 0;
+    transform: none;
+    bottom: 5vmin;
+  }
+}
+
+
+/* --------------------------------------------------------------------------
+   Animations
+   -------------------------------------------------------------------------- */
+
+@keyframes scrollingFrames {
+  /* Move 500px because thats the size of the repeating backgrounds */
+  0%      { transform: translate(-500px, 0); }
+  100%    { transform: translate(0, 0); }
+}
+
+@keyframes playingBackgroundFrames {
+  0%, 50%, 100%   { transform: rotate(90deg) scale(1,1); }
+  25%             { transform: rotate(85deg) scale(1.2, 1.2); }
+  75%             { transform: rotate(95deg) scale(1.2, 1.2); }
+}

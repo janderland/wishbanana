@@ -3,17 +3,22 @@ on: [ push ]
 jobs:
   verify:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./server
     steps:
-      - name: Test
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Setup Deno
         uses: denoland/setup-deno@v2
         with:
           deno-version: v2.x
-      - name: Checkout
-        uses: actions/checkout@v2
-      - name: Lint
+      - name: Lint Server
         run: deno lint
-      - name: Test
+        working-directory: ./server
+      - name: Test Server
         run: deno test
+        working-directory: ./server
+      - name: Lint Client
+        run: deno task lint
+        working-directory: ./client
+      - name: Build Client
+        run: deno task build
+        working-directory: ./client
