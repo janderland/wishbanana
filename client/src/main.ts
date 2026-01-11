@@ -1,21 +1,21 @@
-import { $, $$, fadeIn, hide, onClick, onReady, setHtml, show } from './dom.js';
+import { $, $$, fadeIn, hide, offMouseDown, onClick, onEnter, onMouseDown, onReady, setHtml, show } from './dom.js';
 import { PageManager } from './state.js';
 import { Animations } from './animations.js';
 import { Game } from './game.js';
 
 onReady(() => {
-  const mainState = new PageManager($$('body > div.page'));
+  const mainPages = new PageManager($$('body > div.page'));
 
   // When all images are loaded, switch to the menu page
-  mainState.switch('menu');
+  mainPages.switch('menu');
 
   // MENU ----------------------------------------------------------
   onClick($('#menuToStory'), () => {
-    mainState.switch('story');
+    mainPages.switch('story');
   });
 
   onClick($('#menuToGame'), () => {
-    mainState.switch('game');
+    mainPages.switch('game');
   });
 
   onClick($('#openHelp'), (event) => {
@@ -35,15 +35,15 @@ onReady(() => {
 
   // STORY ---------------------------------------------------------
   onClick($('#storyToMenu'), () => {
-    mainState.switch('menu');
+    mainPages.switch('menu');
   });
 
   // GAME ----------------------------------------------------------
   let WIN_CLICKS = 1;
 
-  const gameState = new PageManager($$('div#game div.state'));
-  let g: Game | null = null;
+  const gamePages = new PageManager($$('div#game div.state'));
   const animations = new Animations();
+  let g: Game | null = null;
 
   const updateYourClicks = (yourClicks: number) => {
     animations.updateYourProgress(yourClicks / WIN_CLICKS);
@@ -78,7 +78,7 @@ onReady(() => {
 
     g.onMatched = (opponentName) => {
       setHtml($('.theirName'), opponentName);
-      gameState.switch('counting');
+      gamePages.switch('counting');
     };
 
     g.onCountDown = (value) => {
@@ -86,7 +86,7 @@ onReady(() => {
     };
 
     g.onPlaying = () => {
-      gameState.switch('playing');
+      gamePages.switch('playing');
     };
 
     g.onClickCount = (yourClicks, theirClicks) => {
@@ -103,29 +103,29 @@ onReady(() => {
         }
         fadeIn($('#gameOverBanner'));
       });
-      document.removeEventListener('mousedown', playingMouseDown);
+      offMouseDown(playingMouseDown);
     };
   };
 
-  mainState.beforeShow('game', () => {
-    gameState.switch('naming');
+  mainPages.beforeShow('game', () => {
+    gamePages.switch('naming');
   });
-  mainState.child('game', gameState);
+  mainPages.child('game', gamePages);
 
-  gameState.afterShow('naming', () => {
+  gamePages.afterShow('naming', () => {
     $('input#name')?.focus();
   });
 
-  gameState.beforeShow('matching', () => {
+  gamePages.beforeShow('matching', () => {
     setHtml($('#matching > h2'), 'connecting...');
   });
 
-  gameState.beforeShow('counting', () => {
+  gamePages.beforeShow('counting', () => {
     setHtml($('#count > h1'), '');
   });
 
-  gameState.beforeShow('playing', () => {
-    document.addEventListener('mousedown', playingMouseDown);
+  gamePages.beforeShow('playing', () => {
+    onMouseDown(playingMouseDown);
 
     hide($('#youWin'));
     hide($('#youLose'));
@@ -135,8 +135,8 @@ onReady(() => {
     animations.attachResizeHandler();
   });
 
-  gameState.beforeHide('playing', () => {
-    document.removeEventListener('mousedown', playingMouseDown);
+  gamePages.beforeHide('playing', () => {
+    offMouseDown(playingMouseDown);
     animations.detachResizeHandler();
 
     if (g !== null) {
@@ -146,14 +146,12 @@ onReady(() => {
   });
 
   onClick($('button#gameToMenu'), (event) => {
-    mainState.switch('menu');
+    mainPages.switch('menu');
     event.stopPropagation();
   });
 
-  $('input#name')?.addEventListener('keydown', (e) => {
-    if ((e as KeyboardEvent).keyCode === 13) {
-      $('button#namingDone')?.click();
-    }
+  onEnter($('input#name'), () => {
+    $('button#namingDone')?.click();
   });
 
   onClick($('button#namingDone'), () => {
@@ -163,10 +161,10 @@ onReady(() => {
 
     initNewGame(name);
 
-    gameState.switch('matching');
+    gamePages.switch('matching');
   });
 
   onClick($('#playAgain'), () => {
-    gameState.switch('naming');
+    gamePages.switch('naming');
   });
 });

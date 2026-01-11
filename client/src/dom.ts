@@ -43,6 +43,12 @@ export function onClick(
   if (el) el.addEventListener('click', handler, options);
 }
 
+export function onEnter(el: HTMLElement | null, handler: () => void): void {
+  if (el) el.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') handler();
+  });
+}
+
 export function onMouseDown(handler: (e: MouseEvent) => void): void {
   document.addEventListener('mousedown', handler);
 }
