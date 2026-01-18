@@ -20,14 +20,14 @@ onReady(() => {
 
   onClick($('#openHelp'), (event) => {
     event.stopPropagation();
-    show($('#helpModal'));
-    show($('#menu #tint'));
+    $('#helpModal')?.classList.add('visible');
+    $('#tint')?.classList.add('visible');
 
     onClick(
       $('body'),
       () => {
-        hide($('#helpModal'));
-        hide($('#menu #tint'));
+        $('#helpModal')?.classList.remove('visible');
+        $('#tint')?.classList.remove('visible');
       },
       { once: true },
     );
