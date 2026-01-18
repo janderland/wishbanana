@@ -22,9 +22,9 @@ export class PageManager {
       child.switch('');
     }
 
-    // Hide all elements
+    // Hide all elements (remove visible class)
     this.elements.forEach((el) => {
-      (el as HTMLElement).style.display = 'none';
+      (el as HTMLElement).classList.remove('visible');
     });
 
     // Show new page
@@ -32,7 +32,7 @@ export class PageManager {
 
     const targetElement = this.elements.find((el) => el.id === stateName);
     if (targetElement) {
-      (targetElement as HTMLElement).style.display = 'block';
+      (targetElement as HTMLElement).classList.add('visible');
     }
 
     this.currentPage = stateName;
