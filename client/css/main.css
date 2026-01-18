@@ -16,7 +16,7 @@
    -------------------------------------------------------------------------- */
 
 html {
-  font-family: sans-serif;
+  font-family: 'Barriecito', cursive;
 }
 
 body {
@@ -93,6 +93,7 @@ h3 {
    =========== */
 
 button {
+  font-family: inherit;
   font-size: 6vmin;
   border: max(1px, 0.2vmin) solid black;
   border-radius: 5px;
@@ -103,6 +104,7 @@ button {
 }
 
 input {
+  font-family: inherit;
   font-size: 6vmin;
   border: max(1px, 0.2vmin) solid black;
   border-radius: 5px;
@@ -142,6 +144,10 @@ button:hover {
    Layout - Menu Page
    -------------------------------------------------------------------------- */
 
+#menu {
+  width: 100vw;
+}
+
 #title {
   position: absolute;
   left: 50%;
@@ -174,15 +180,31 @@ button:hover {
   font-size: 7vmin;
   background-color: white;
   box-shadow: inset 0px 0px 20px 1px rgba(0,0,0,0.75);
-  display: none;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 300ms ease-in-out, visibility 300ms;
+}
+
+#helpModal.visible {
+  opacity: 1;
+  visibility: visible;
 }
 
 #tint {
   position: absolute;
   height: 100%;
   width: 100%;
+  top: 0;
+  left: 0;
   background-color: rgba(0, 0, 0, 0.75);
-  display: none;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 300ms ease-in-out, visibility 300ms;
+}
+
+#tint.visible {
+  opacity: 1;
+  visibility: visible;
 }
 
 
@@ -200,7 +222,9 @@ button:hover {
   margin: 0 auto;
   padding: 0 20px;
   box-shadow: inset 0px 0px 20px 1px rgba(0,0,0,0.75);
-  background-color: #f8f7f4;
+  background-color: #f5f0e6;
+  font-family: 'Caveat Brush', cursive;
+  font-size: 2em;
 }
 
 #storyTitle {
@@ -214,6 +238,10 @@ button:hover {
 /* --------------------------------------------------------------------------
    Layout - Game Page
    -------------------------------------------------------------------------- */
+
+#game {
+  width: 100vw;
+}
 
 #naming {
   position: absolute;
@@ -279,6 +307,8 @@ button:hover {
   width: 100%;
   height: 100%;
   position: absolute;
+  top: 0;
+  left: 0;
 }
 
 #flash {
@@ -343,7 +373,7 @@ button:hover {
   transform: translate(0, -50%);
   text-align: center;
   width: 100%;
-  background-color: #fff;
+  background-color: #f5f0e6;
   display: none;
   user-select: none;
 
@@ -467,6 +497,8 @@ button:hover {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  font-family: 'Caveat Brush', cursive;
+  font-size: 10vmin;
 
   /* So that the text-shadow doesn't get cut off */
   padding-bottom: 5px;
