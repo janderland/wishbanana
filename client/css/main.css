@@ -19,7 +19,7 @@ html, body {
   /* Prevent iOS Safari from scrolling when keyboard opens */
   position: fixed;
   width: 100%;
-  height: 100%;
+  height: 100dvh;
   overflow: hidden;
   margin: 0;
 }
@@ -408,7 +408,7 @@ button:hover {
 
 .page {
   width: 80vw;
-  height: 100vh;
+  height: 100dvh;
   position: absolute;
   top: 0;
   left: 50%;
