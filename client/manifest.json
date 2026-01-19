@@ -1,0 +1,8 @@
+{
+  "name": "Wish Banana",
+  "short_name": "Wish Banana",
+  "display": "standalone",
+  "start_url": "/",
+  "background_color": "#547aff",
+  "theme_color": "#547aff"
+}
