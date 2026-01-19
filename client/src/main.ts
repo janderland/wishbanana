@@ -1,4 +1,4 @@
-import { $, $$, fadeIn, hide, offMouseDown, onClick, onEnter, onMouseDown, onReady, setHtml, show } from './dom.js';
+import { $, $$, fadeIn, hide, offMouseDown, onClick, onEnter, onMouseDown, onReady, setHtml, setHtmlAll, show } from './dom.js';
 import { PageManager } from './state.js';
 import { Animations } from './animations.js';
 import { Game } from './game.js';
@@ -77,7 +77,7 @@ onReady(() => {
     };
 
     g.onMatched = (opponentName) => {
-      setHtml($('.theirName'), opponentName);
+      setHtmlAll($$('.theirName'), opponentName);
       gamePages.switch('counting');
     };
 
@@ -157,7 +157,7 @@ onReady(() => {
   onClick($('button#namingDone'), () => {
     const nameInput = $('input#name') as HTMLInputElement;
     const name = nameInput.value;
-    setHtml($('.yourName'), name);
+    setHtmlAll($$('.yourName'), name);
 
     initNewGame(name);
 
