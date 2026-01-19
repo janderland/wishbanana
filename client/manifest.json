@@ -1,0 +1,20 @@
+{
+  "name": "Wish Banana",
+  "short_name": "Wish Banana",
+  "display": "standalone",
+  "start_url": "/",
+  "background_color": "#547aff",
+  "theme_color": "#547aff",
+  "icons": [
+    {
+      "src": "assets/favicon.png",
+      "sizes": "32x32",
+      "type": "image/png"
+    },
+    {
+      "src": "assets/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    }
+  ]
+}
