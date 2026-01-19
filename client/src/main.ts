@@ -1,4 +1,4 @@
-import { $, $$, fadeIn, hide, offMouseDown, onClick, onEnter, onMouseDown, onReady, setHtml, show } from './dom.js';
+import { $, $$, fadeIn, hide, offMouseDown, onBlur, onClick, onEnter, onMouseDown, onReady, setHtml, show } from './dom.js';
 import { PageManager } from './state.js';
 import { Animations } from './animations.js';
 import { Game } from './game.js';
@@ -152,6 +152,12 @@ onReady(() => {
 
   onEnter($('input#name'), () => {
     $('button#namingDone')?.click();
+  });
+
+  // iOS Safari scrolls the page when the keyboard opens, but with
+  // overflow:hidden users can't scroll back. Reset scroll on blur.
+  onBlur($('input#name'), () => {
+    window.scrollTo(0, 0);
   });
 
   onClick($('button#namingDone'), () => {
