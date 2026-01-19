@@ -35,6 +35,10 @@ export function setHtml(el: HTMLElement | null, html: string): void {
   if (el) el.innerHTML = html;
 }
 
+export function setHtmlAll(els: NodeListOf<HTMLElement>, html: string): void {
+  els.forEach((el) => el.innerHTML = html);
+}
+
 export function onClick(
   el: HTMLElement | null,
   handler: (e: MouseEvent) => void,
