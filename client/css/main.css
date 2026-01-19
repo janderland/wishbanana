@@ -17,6 +17,8 @@
 
 html {
   font-family: 'Barriecito', cursive;
+  /* Prevent double-tap zoom on iOS Safari */
+  touch-action: manipulation;
 }
 
 body {
@@ -361,6 +363,8 @@ button:hover {
   width: 100%;
   height: 100%;
   position: absolute;
+  /* Prevent all zoom gestures during gameplay */
+  touch-action: none;
 }
 
 #gameOverBanner {
