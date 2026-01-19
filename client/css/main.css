@@ -15,16 +15,19 @@
    Base Styles
    -------------------------------------------------------------------------- */
 
+html, body {
+  /* Prevent iOS Safari from scrolling when keyboard opens */
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  margin: 0;
+}
+
 html {
   font-family: 'Barriecito', cursive;
   /* Prevent double-tap zoom on iOS Safari */
   touch-action: manipulation;
-}
-
-body {
-  /* prevent scrolling on desktop browsers */
-  overflow: hidden;
-  margin: 0;
 }
 
 #sharedBackground {

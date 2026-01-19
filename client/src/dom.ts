@@ -49,10 +49,6 @@ export function onEnter(el: HTMLElement | null, handler: () => void): void {
   });
 }
 
-export function onBlur(el: HTMLElement | null, handler: () => void): void {
-  if (el) el.addEventListener('blur', handler);
-}
-
 export function onMouseDown(handler: (e: MouseEvent) => void): void {
   document.addEventListener('mousedown', handler);
 }
