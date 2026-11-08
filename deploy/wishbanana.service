@@ -1,0 +1,18 @@
+[Unit]
+Description=Wish Banana game server (Docker)
+Requires=docker.service
+After=docker.service network-online.target
+Wants=network-online.target
+
+[Service]
+# Run the container in the foreground so systemd supervises it and
+# journald captures its output. The deno image runs tini as PID 1, so
+# SIGTERM from `docker stop` reaches Deno without needing --init.
+ExecStartPre=-/usr/bin/docker rm -f wishbanana
+ExecStart=/usr/bin/docker run --rm --name wishbanana -p 8000:8000 wishbanana:latest
+ExecStop=/usr/bin/docker stop wishbanana
+Restart=always
+RestartSec=2
+
+[Install]
+WantedBy=multi-user.target

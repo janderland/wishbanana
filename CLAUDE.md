@@ -56,5 +56,6 @@ Server tests use Deno's `@std/testing` with spy mocks and FakeTime. Tests inject
 
 ## Important Notes
 - **Message sync is critical**: Client `messages.ts` and server `message.ts` must stay in sync
-- **Client WebSocket URL**: Hardcoded to `wss://wishbanana.com` (production only)
+- **Client WebSocket URL**: Hardcoded to `wss://game.wishbanana.com` (production only)
+- **Deployment**: Server runs as a Docker container (`server/Dockerfile`) managed by systemd on an exe.dev VM (see `deploy/`). Client is on GitHub Pages
 - **Single player testing**: Set `WB_SINGLE_PLAYER=true` env var to use auto-responding bot

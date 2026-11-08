@@ -63,7 +63,7 @@ export class Naming implements State {
 // During the counting state, the game counts down from 5 to 0,
 // after which the game switches to the gaming state.
 export class Counting implements State {
-    private readonly intervalID: number;
+    private readonly intervalID: ReturnType<typeof setInterval>;
     readonly id = "counting";
 
     constructor(
@@ -101,7 +101,7 @@ export class Counting implements State {
 // players. When one of the players reaches the win count, the
 // game switches to the done state.
 export class Gaming implements State {
-    private readonly intervalID: number;
+    private readonly intervalID: ReturnType<typeof setInterval>;
     readonly id = "gaming";
 
     constructor(
