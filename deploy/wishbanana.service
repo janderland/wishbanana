@@ -1,5 +1,5 @@
 [Unit]
-Description=Wish Banana game server (Docker)
+Description=Wish Banana Server
 Requires=docker.service
 After=docker.service network-online.target
 Wants=network-online.target

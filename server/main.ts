@@ -5,7 +5,7 @@ const singlePlayer = Deno.env.get("WB_SINGLE_PLAYER") !== undefined;
 let gameID = 0;
 let connID = 0;
 
-// Behind a reverse proxy (e.g. exe.dev), remoteAddr is the proxy's address,
+// Behind a reverse proxy, remoteAddr is the proxy's address,
 // so prefer the client IP from X-Forwarded-For for logging.
 function clientIP(req: Request, info: Deno.ServeHandlerInfo<Deno.NetAddr>): string {
     const forwarded = req.headers.get("x-forwarded-for");

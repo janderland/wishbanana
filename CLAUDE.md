@@ -57,5 +57,19 @@ Server tests use Deno's `@std/testing` with spy mocks and FakeTime. Tests inject
 ## Important Notes
 - **Message sync is critical**: Client `messages.ts` and server `message.ts` must stay in sync
 - **Client WebSocket URL**: Hardcoded to `wss://game.wishbanana.com` (production only)
-- **Deployment**: Server runs as a Docker container (`server/Dockerfile`) managed by systemd on an exe.dev VM (see `deploy/`). Client is on GitHub Pages
+- **Deployment**: Server runs as a Docker container (`deploy/Dockerfile`) managed by systemd on the exe.dev VM `janderland`. Client is on GitHub Pages. See Deployment below
 - **Single player testing**: Set `WB_SINGLE_PLAYER=true` env var to use auto-responding bot
+
+## Deployment
+The server runs on an exe.dev VM (default name `janderland`, reachable via `ssh janderland.exe.xyz`) as a Docker container supervised by systemd (`deploy/wishbanana.service`). The image is built on the VM from `deploy/Dockerfile` with the repo root as the build context; `deploy/Dockerfile.dockerignore` limits the context to `server/`.
+
+- **Deploy**: `deploy/deploy.sh [vm-name]` pulls `main` on the VM, rebuilds the image, and (re)enables and restarts the service.
+- **Logs**: `ssh janderland.exe.xyz journalctl -u wishbanana -n 100 --no-pager`
+
+### First-time VM setup
+1. Create the VM: `ssh exe.dev new --name=janderland`
+2. Confirm Docker is at `/usr/bin/docker` on the VM (the unit file uses that path).
+3. Clone the repo: `ssh janderland.exe.xyz git clone https://github.com/janderland/wishbanana.git ~/wishbanana`
+4. Run `deploy/deploy.sh`.
+5. Make the server public: `ssh exe.dev share set-public janderland` (proxies port 8000).
+6. Custom domain: CNAME `game.wishbanana.com` → `janderland.exe.xyz`, then `ssh exe.dev domain add janderland game.wishbanana.com`.

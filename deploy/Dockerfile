@@ -1,7 +1,8 @@
+# Build from the repo root: docker build -f deploy/Dockerfile .
 FROM denoland/deno:2.9.8
 
 WORKDIR /app
-COPY . .
+COPY server/ .
 
 USER deno
 EXPOSE 8000
