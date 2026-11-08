@@ -1,0 +1,7 @@
+# Applies to builds using deploy/Dockerfile. Patterns are relative to
+# the build context (the repo root). Only the server source is needed.
+*
+!server/*.ts
+!server/deno.json
+!server/deno.lock
+server/*_test.ts
