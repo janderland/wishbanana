@@ -1,60 +1,79 @@
 import {MatchMaker} from "./match.ts";
 import {Game} from "./game.ts";
 
-const singlePlayer = Deno.env.get("WB_SINGLE_PLAYER") !== undefined;
+const SINGLE = Deno.env.get("WB_SINGLE_PLAYER") !== undefined;
+const PROTOCOL = "wishbanana";
 let gameID = 0;
 let connID = 0;
 
-// Behind a reverse proxy, remoteAddr is the proxy's address,
-// so prefer the client IP from X-Forwarded-For for logging.
-function clientIP(req: Request, info: Deno.ServeHandlerInfo<Deno.NetAddr>): string {
-    const forwarded = req.headers.get("x-forwarded-for");
-    if (forwarded) {
-        const ips = forwarded.split(",");
-        return ips[ips.length - 1].trim();
-    }
-    return info.remoteAddr.hostname;
-}
-
-const matchMaker = new MatchMaker<WebSocket>(singlePlayer, (player1, player2) => {
-    console.log("starting game");
-    new Game((++gameID).toString(), player1, player2);
+const matchMaker = new MatchMaker<WebSocket>(SINGLE, (p1, p2) => {
+  new Game((++gameID).toString(), p1, p2);
 });
 
-console.log("Server starting...");
+const clientIP = (req: Request, addr: Deno.NetAddr): string => {
+  // Behind a reverse proxy, remoteAddr is the proxy's address,
+  // so prefer the client IP from X-Forwarded-For.
+  return req.headers.get("x-forwarded-for")?.split(",").at(-1)?.trim() || addr.hostname;
+};
+
+const validate = (req: Request): Response | null => {
+  if (req.method != "GET") {
+    return new Response(null, {status: 400});
+  }
+
+  if (new URL(req.url).pathname != "/") {
+    return new Response(null, {status: 400});
+  }
+
+  if (req.headers.get("upgrade") != "websocket") {
+    return new Response(null, {status: 400});
+  }
+
+  if (!req.headers.get("sec-websocket-protocol")?.split(",").map((p) => p.trim())?.includes(PROTOCOL)) {
+    return new Response(null, {status: 400});
+  }
+
+  return null;
+};
+
+const accept = (req: Request, ip: string): Response => {
+  console.log(`accepting connection ${ip}`);
+
+  const {socket, response} = Deno.upgradeWebSocket(req, {protocol: PROTOCOL});
+
+  // Matchmaking is not only keyed by client IP, but also by an
+  // incrementing ID. This allows multiple connections from a
+  // single IP. This may be necessary if multiple clients are
+  // behind a NAT or there is a reverse-proxy infront of this
+  // server.
+  const clientID = `${ip}:${++connID}`;
+
+  socket.addEventListener("open", () => {
+    matchMaker.enqueue(clientID, socket);
+  });
+
+  socket.addEventListener("close", (event) => {
+    if (matchMaker.drop(clientID)) {
+      console.log(`closed during queue ${clientID}: ${JSON.stringify(event)}`);
+    }
+  });
+
+  socket.addEventListener("error", (event) => {
+    if (matchMaker.drop(clientID)) {
+      console.log(`errored during queue ${clientID}: ${JSON.stringify(event)}`);
+    }
+  });
+
+  return response;
+};
 
 Deno.serve((req, info) => {
-    console.log(`Request received: ${req.method} ${req.url}`);
+  const ip = clientIP(req, info.remoteAddr);
 
-    const ip = clientIP(req, info);
+  const rejection = validate(req);
+  if (rejection != null) return rejection;
 
-    if (req.headers.get("upgrade") != "websocket") {
-        console.log(`Rejecting connection from ${ip}`);
-        return new Response(null, {status: 400});
-    }
-
-    // Matchmaking is keyed by a per-connection ID rather than the client IP,
-    // since many clients can share an IP (NAT, or a reverse proxy).
-    const remote = `${++connID}@${ip}`;
-    console.log(`Accepting connection ${remote}`);
-
-    const {socket, response} = Deno.upgradeWebSocket(req, {protocol: "wishbanana"});
-
-    socket.addEventListener("open", () => {
-        matchMaker.enqueue(remote, socket);
-    });
-
-    socket.addEventListener("close", (event) => {
-        if (matchMaker.drop(remote)) {
-            console.log(`Closed during match making ${remote}: ${JSON.stringify(event)}`);
-        }
-    })
-
-    socket.addEventListener("error", (event) => {
-        if (matchMaker.drop(remote)) {
-            console.log(`Errored during match making ${remote}: ${JSON.stringify(event)}`);
-        }
-    })
-
-    return response;
+  return accept(req, ip);
 });
+
+console.log("listening...");
