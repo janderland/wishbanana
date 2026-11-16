@@ -8,6 +8,15 @@ enum GameState {
   GameOver,
 }
 
+// When the page is served locally, connect to a local server instead of production.
+function serverURL(): string {
+  const host = window.location.hostname;
+  if (host === 'localhost' || host === '127.0.0.1') {
+    return 'ws://localhost:8000';
+  }
+  return 'wss://game.wishbanana.com';
+}
+
 export class Game {
   count = 0;
   onConnected?: () => void;
@@ -22,7 +31,7 @@ export class Game {
   private state = GameState.Connected;
 
   constructor(name: string) {
-    this.ws = new WebSocket('ws://localhost:8000', ['wishbanana']);
+    this.ws = new WebSocket(serverURL(), ['wishbanana']);
 
     this.ws.onopen = () => {
       this.onConnected?.();
