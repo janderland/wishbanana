@@ -1,4 +1,4 @@
-import {Queue} from "./match.ts";
+import {Queue} from "./queue.ts";
 import {assertEquals} from "@std/assert";
 
 Deno.test("enqueue", () => {

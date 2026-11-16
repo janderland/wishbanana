@@ -1,4 +1,4 @@
-import {Queue} from "./match.ts";
+import {Queue} from "./queue.ts";
 import {Game} from "./game.ts";
 
 const SINGLE = Deno.env.get("WB_SINGLE_PLAYER") !== undefined;
