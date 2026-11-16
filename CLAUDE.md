@@ -11,7 +11,7 @@ Wish Banana is a competitive web-based click game where two players race to clic
 ### Client (`/client`)
 ```bash
 deno task build      # Compile TypeScript to dist/
-deno task dev        # Watch mode compilation
+deno task serve      # Serve the client at http://localhost:8080
 deno task lint       # Run linter
 deno task fmt        # Format code
 ```
