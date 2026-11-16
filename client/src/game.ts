@@ -22,7 +22,7 @@ export class Game {
   private state = GameState.Connected;
 
   constructor(name: string) {
-    this.ws = new WebSocket('wss://game.wishbanana.com/', ['wishbanana']);
+    this.ws = new WebSocket('ws://localhost:8000', ['wishbanana']);
 
     this.ws.onopen = () => {
       this.onConnected?.();
