@@ -1,4 +1,4 @@
-import {MatchMaker} from "./match.ts";
+import {Queue} from "./match.ts";
 import {Game} from "./game.ts";
 
 const SINGLE = Deno.env.get("WB_SINGLE_PLAYER") !== undefined;
@@ -6,7 +6,7 @@ const PROTOCOL = "wishbanana";
 let gameID = 0;
 let connID = 0;
 
-const matchMaker = new MatchMaker<WebSocket>(SINGLE, (p1, p2) => {
+const queue = new Queue<WebSocket>(SINGLE, (p1, p2) => {
   new Game((++gameID).toString(), p1, p2);
 });
 
@@ -49,17 +49,17 @@ const accept = (req: Request, ip: string): Response => {
   const clientID = `${ip}:${++connID}`;
 
   socket.addEventListener("open", () => {
-    matchMaker.enqueue(clientID, socket);
+    queue.enqueue(clientID, socket);
   });
 
   socket.addEventListener("close", (event) => {
-    if (matchMaker.drop(clientID)) {
+    if (queue.drop(clientID)) {
       console.log(`closed during queue ${clientID}: ${JSON.stringify(event)}`);
     }
   });
 
   socket.addEventListener("error", (event) => {
-    if (matchMaker.drop(clientID)) {
+    if (queue.drop(clientID)) {
       console.log(`errored during queue ${clientID}: ${JSON.stringify(event)}`);
     }
   });

@@ -1,10 +1,10 @@
-export class MatchMaker<T> {
+export class Queue<T> {
     private player: T | undefined;
     private id = "";
 
     constructor(
         private readonly singlePlayer: boolean,
-        private readonly startGame: (item1: T, item2?: T) => void,
+        private readonly startGame: (p1: T, p2?: T) => void,
     ) {
     }
 
