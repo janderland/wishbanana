@@ -1,6 +1,6 @@
 {
   "tasks": {
-    "build": "deno run -A npm:typescript/tsc -p tsconfig.json",
+    "build": "deno run -A npm:typescript@^7.0.2/tsc -p tsconfig.json",
     "serve": "deno run -A jsr:@std/http/file-server -p 8080 .",
     "lint": "deno lint src/",
     "fmt": "deno fmt src/"
