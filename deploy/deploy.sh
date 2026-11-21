@@ -3,7 +3,7 @@
 #   deploy/deploy.sh [vm-name]
 # Restarting ends any games in progress.
 set -e
-VM="${1:-janderland}"
+VM="${1:-wishbanana}"
 
 ssh "$VM.exe.xyz" bash -s <<'REMOTE'
 set -e

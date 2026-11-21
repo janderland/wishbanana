@@ -14,7 +14,7 @@ function serverURL(): string {
   if (host === 'localhost' || host === '127.0.0.1') {
     return 'ws://localhost:8000';
   }
-  return 'wss://game.wishbanana.com';
+  return 'wss://wishbanana.exe.xyz';
 }
 
 export class Game {
