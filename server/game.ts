@@ -214,13 +214,15 @@ export class Game {
     }
 
     update(event: [PlayerID, Message] | State) {
-        if (event instanceof Array) {
-            this._state = this._state.update(event);
+        const next = event instanceof Array ? this._state.update(event) : event;
+        if (next === this._state) {
             return;
         }
 
+        // Whether the transition came from a message or was pushed
+        // directly, the old state must be stopped to clear its timers.
         this._state.stop()
-        this._state = event;
+        this._state = next;
         console.log(`game ID: ${this.id} state: ${this.state.id}`);
     }
 
@@ -238,7 +240,7 @@ export class Game {
         return () => {
             console.log(`game ID: ${this.id} state: ${this.state.id} closed: ${i}`)
             this.players[i] = new NullWebsocket();
-            this.update(new Done(this, i ? 0 : 1))
+            this.forfeit(i);
         }
     }
 
@@ -246,7 +248,17 @@ export class Game {
         return () => {
             console.log(`game ID: ${this.id} state: ${this.state.id} errored: ${i}`)
             this.players[i] = new NullWebsocket();
-            this.update(new Done(this, i ? 0 : 1))
+            this.forfeit(i);
         }
+    }
+
+    // Ends the game with the other player as the winner. Once the
+    // game is already done, a disconnect must not send a second
+    // GAMEOVER (Done sends GAMEOVER from its constructor).
+    private forfeit(i: PlayerID) {
+        if (this._state instanceof Done) {
+            return;
+        }
+        this.update(new Done(this, i ? 0 : 1));
     }
 }

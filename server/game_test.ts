@@ -134,6 +134,18 @@ Deno.test("game", async (t) => {
             });
 
             assertInstanceOf(g.state, Done);
+
+            // The Gaming state's CLICKCOUNT interval must be
+            // stopped once the game is over.
+            tm.tick(3000);
+            assertSpyCalls(p1.send, 4);
+            assertSpyCalls(p2.send, 4);
+
+            // A disconnect after the game is over must not
+            // send a second GAMEOVER to the remaining player.
+            p1.sendCloseToServer();
+            assertSpyCalls(p2.send, 4);
+            assertInstanceOf(g.state, Done);
         });
     });
 
